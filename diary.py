@@ -303,22 +303,19 @@ class DiaryMainWindow(QMainWindow, Ui_DiaryMainWindow):
 
     def open_event(self):
         """Функция-обработчик нажатия на кнопку открытия подробностей о событии"""
-        if not self.all_list_events.currentItem():
-            self.error_label.setText('Не выбрано ни одного события')
-        else:
-            cursor = self.data_base_connect.cursor()
-            select_event = self.all_list_events.currentItem().text().split('  |  ')
-            date_string = select_event[0]
-            time = select_event[1] + ':00'
-            title = select_event[2]
-            current_event = cursor.execute("""
-            SELECT * FROM diarys WHERE title = ? AND date_string = ? AND time = ?""",
-                                           (title, date_string, time,)).fetchall()
-            self.details_event_dialog = DetailsEventDialog(current_event, self.user_settings,
-                                                           self.data_base_connect)
-            self.details_event_dialog.finished.connect(self.load_data_base_on_widget)
-            self.details_event_dialog.exec()
-            cursor.close()
+        cursor = self.data_base_connect.cursor()
+        select_event = self.all_list_events.currentItem().text().split('  |  ')
+        date_string = select_event[0]
+        time = select_event[1] + ':00'
+        title = select_event[2]
+        current_event = cursor.execute("""
+        SELECT * FROM diarys WHERE title = ? AND date_string = ? AND time = ?""",
+                                       (title, date_string, time,)).fetchall()
+        self.details_event_dialog = DetailsEventDialog(current_event, self.user_settings,
+                                                       self.data_base_connect)
+        self.details_event_dialog.finished.connect(self.load_data_base_on_widget)
+        self.details_event_dialog.exec()
+        cursor.close()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:  # Удаление выбранного события
